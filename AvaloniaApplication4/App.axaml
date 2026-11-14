@@ -1,0 +1,50 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaApplication4.App"
+             xmlns:local="using:AvaloniaApplication4"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Tahoma, Segoe UI" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Background" Value="#D4D0C8" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#D4D0C8" />
+            <Setter Property="Foreground" Value="#000000" />
+            <Setter Property="Padding" Value="7,4" />
+            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border x:Name="RightBottom" BorderBrush="#777777" BorderThickness="0,0,2,2">
+                        <Border x:Name="TopLeft" BorderBrush="#FFFFFF" BorderThickness="2,2,0,0">
+                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Border>
+                        </Border>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button:pressed /template/ Border#RightBottom">
+            <Setter Property="BorderBrush" Value="#FFFFFF" />
+        </Style>
+        <Style Selector="Button:pressed /template/ Border#TopLeft">
+            <Setter Property="BorderBrush" Value="#777777" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#000000" />
+        </Style>
+    </Application.Styles>
+</Application>

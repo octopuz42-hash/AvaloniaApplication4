@@ -1,0 +1,117 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaApplication4.ViewModels"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="using:AvaloniaApplication4.Controls"
+        xmlns:models="using:AvaloniaApplication4.Models"
+        xmlns:views="using:AvaloniaApplication4.Views"
+        mc:Ignorable="d"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        x:Class="AvaloniaApplication4.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Paint — Классический"
+        Width="1080" Height="760"
+        MinWidth="760" MinHeight="520">
+
+    <Window.Resources>
+        <views:EnumToIntConverter x:Key="EnumToIntConverter" />
+    </Window.Resources>
+
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <DockPanel Background="#D4D0C8">
+        <Menu DockPanel.Dock="Top" Background="#D4D0C8" Foreground="#000000">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Новый холст" Command="{Binding CreateNewCanvasCommand}" />
+                <Separator />
+                <MenuItem Header="Сохранить как..." Click="SaveButton_Click" />
+            </MenuItem>
+            <MenuItem Header="Правка">
+                <MenuItem Header="Отменить (Undo)" Command="{Binding UndoCommand}" HotKey="Ctrl+Z" />
+                <MenuItem Header="Повторить (Redo)" Command="{Binding RedoCommand}" HotKey="Ctrl+Y" />
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Bottom" Background="#D4D0C8" BorderBrush="#FFFFFF" BorderThickness="1,1,0,0" Padding="6,3">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Готово" />
+                <TextBlock Text="|" />
+                <TextBlock Text="Холст:" />
+                <TextBlock Text="{Binding CanvasWidth}" />
+                <TextBlock Text="×" />
+                <TextBlock Text="{Binding CanvasHeight}" />
+                <TextBlock Text="px" />
+            </StackPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Left" Width="250" Background="#D4D0C8" BorderBrush="#777777" BorderThickness="0,0,2,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="8" Spacing="8">
+                    <TextBlock Text="Параметры холста" FontWeight="Bold" />
+                    <Border Background="#E0DFE3" BorderBrush="#777777" BorderThickness="1" Padding="7">
+                        <StackPanel Spacing="5">
+                            <Grid ColumnDefinitions="*,90" RowDefinitions="Auto,Auto" RowSpacing="4">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Ширина:" VerticalAlignment="Center" />
+                                <NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding CanvasWidth}" Minimum="100" Maximum="2000" Increment="50" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Высота:" VerticalAlignment="Center" />
+                                <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding CanvasHeight}" Minimum="100" Maximum="2000" Increment="50" />
+                            </Grid>
+                            <Button Content="Применить размер" Command="{Binding CreateNewCanvasCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Инструменты" FontWeight="Bold" />
+                    <Border Background="#FFFFFF" BorderBrush="#777777" BorderThickness="1" Padding="3">
+                        <ListBox SelectedIndex="{Binding CurrentTool, Converter={StaticResource EnumToIntConverter}}"
+                                 Background="#FFFFFF" BorderThickness="0">
+                            <ListBoxItem Content="Карандаш" />
+                            <ListBoxItem Content="Заливка" />
+                            <ListBoxItem Content="Ластик" />
+                        </ListBox>
+                    </Border>
+
+                    <TextBlock Text="Размер кисти" FontWeight="Bold" />
+                    <Border Background="#E0DFE3" BorderBrush="#777777" BorderThickness="1" Padding="7">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{Binding BrushSize, StringFormat='Размер: {0} px'}" />
+                            <Slider Value="{Binding BrushSize}" Minimum="1" Maximum="50" TickFrequency="1" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Эффекты и фильтры" FontWeight="Bold" />
+                    <UniformGrid Columns="2" Rows="2">
+                        <Button Content="Инверсия" Command="{Binding ApplyFilterCommand}" CommandParameter="{x:Static models:ImageFilterType.Invert}" Margin="2" />
+                        <Button Content="Ч/Б фото" Command="{Binding ApplyFilterCommand}" CommandParameter="{x:Static models:ImageFilterType.Grayscale}" Margin="2" />
+                        <Button Content="Сепия" Command="{Binding ApplyFilterCommand}" CommandParameter="{x:Static models:ImageFilterType.Sepia}" Margin="2" />
+                        <Button Content="Размытие" Command="{Binding ApplyFilterCommand}" CommandParameter="{x:Static models:ImageFilterType.Blur}" Margin="2" />
+                    </UniformGrid>
+
+                    <TextBlock Text="Цвет" FontWeight="Bold" />
+                    <Border Background="#FFFFFF" BorderBrush="#777777" BorderThickness="1" Padding="4">
+                        <ColorPicker Color="{Binding SelectedColor}" HorizontalAlignment="Stretch" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <ScrollViewer x:Name="CanvasScrollViewer"
+                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                      Background="#808080"
+                      PointerWheelChanged="CanvasScrollViewer_PointerWheelChanged">
+            <Border x:Name="CanvasHost" Margin="18" Background="#FFFFFF" BorderBrush="#777777" BorderThickness="1"
+                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Width="{Binding ScaledCanvasWidth}" Height="{Binding ScaledCanvasHeight}">
+                <controls:PaintCanvas Bitmap="{Binding Bitmap}"
+                                      Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
+                                      RenderTransformOrigin="0,0">
+                    <controls:PaintCanvas.RenderTransform>
+                        <ScaleTransform ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}" />
+                    </controls:PaintCanvas.RenderTransform>
+                </controls:PaintCanvas>
+            </Border>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
