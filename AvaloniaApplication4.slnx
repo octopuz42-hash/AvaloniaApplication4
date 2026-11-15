@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="AvaloniaApplication4/AvaloniaApplication4.csproj" />
+  <Project Path="AvaloniaApplication4/AvaloniaApplication4.csproj">
+    <BuildType Project="Release" />
+  </Project>
 </Solution>
